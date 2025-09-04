@@ -63,12 +63,7 @@ Main_Web_Search/
 │
 ├── vllm_embedding_service/      # VLLM tabanlı embedding servisi
 │   └── main_vllm_embedding.py   # Servis başlangıç dosyası
-│
-├── data_v2/                     # Veri dosyaları
-│   └── Ürün Tanıtım Materyalleri_text/  # HAVELSAN ürün dokümanları
-│
-└── models/                      # ML modelleri
-    └── Qwen3-Embedding-4B/      # Embedding modeli
+
 ```
 ## Gereksinimler
 
@@ -90,60 +85,13 @@ git clone https://gobitbucket.havelsan.com.tr/scm/main/main-websearch.git
 cd Main_Web_Search
 ```
 
-
 ### 2. Docker ile Çalıştırma
 
-#### VLLM Servisini Başlat
+#### VLLM Embedding Servisini Başlat
 ```bash
 cd vllm_embedding_service
 python main_vllm_embedding.py --model-path ../models/Qwen3-Embedding-4B --port 21003
 ```
-### Ana Routing Endpoint
-```bash
-POST http://10.150.98.209:9500/ask_question
-Content-Type: application/json
-
-{
-    "query": "HAVELSAN BARKAN sistemi hakkında bilgi ver",
-    "top_k": 5
-}
-```
-
-#### Routing Servisini Docker ile Çalıştır
-```bash
-docker-compose up -d main-web-search
-```
-
-**Swagger UI Erişimi:** http://10.150.98.209:9500/docs
-
-#### Tüm Servisleri Başlatma
-
-```bash
-docker-compose up -d
-```
-
-**cURL Örneği:**
-```bash
-curl -X POST "http://10.150.98.209:9500/ask_question" \
-  -H "Content-Type: application/json" \
-  -d '{"query": "havelsan barkan ürünü nedir?"}'
-```
-
-**Swagger UI:** http://10.150.98.209:9500/docs
-
-### Web Search Endpoint
-```bash
-POST http://localhost:8000/search
-Content-Type: application/json
-
-{
-    "query": "latest technology trends",
-    "topk": 10
-}
-```
-
-### Embedding Service
-
 **cURL Örneği:**
 ```bash
 curl http://localhost:21003/v1/embeddings \
@@ -153,13 +101,40 @@ curl http://localhost:21003/v1/embeddings \
         "input": ["Merhaba dünya", "Embedding testi"]
       }'
 ```
+#### Routing Servisini Docker ile Çalıştır
+```bash
+docker-compose up -d main-web-search
+```
+
+### Routing Endpoint
+
+**cURL Örneği:**
+```bash
+curl -X POST "http://10.150.98.209:9500/ask_question" \
+  -H "Content-Type: application/json" \
+  -d '{"query": "havelsan barkan ürünü nedir?"}'
+```
+
+**Swagger UI Erişimi:** http://10.150.98.209:9500/docs
+
+### Web Search Endpoint
+
+```bash
+POST http://localhost:8000/search
+Content-Type: application/json
+
+{
+    "query": "latest technology trends",
+    "topk": 10
+}
+```
+#### Tüm Servisleri Başlatma
+
+```bash
+docker-compose up -d
+```
 
 ## Ek Notlar
-
-### Geliştirme İpuçları
-- Swagger UI üzerinden API'leri test edebilirsiniz
-- Development modunda `--reload` parametresi kullanarak hot-reload aktif edebilirsiniz
-- VLLM servisi başlatılırken model path'inin doğru olduğundan emin olun
 
 ### Endpoint Erişim Bilgileri
 - **Routing Swagger UI**: http://10.150.98.209:9500/docs
