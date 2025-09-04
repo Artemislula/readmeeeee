@@ -85,7 +85,7 @@ Projenin çalıştırılabilmesi için aşağıdaki yazılım ve donanım gereks
 - **NVIDIA GPU** *(opsiyonel)* → VLLM embedding servisinde büyük modelleri hızlandırmak için önerilir.  
 
 
-#### 1. Kurulum & Çalıştırma
+## 1. Kurulum & Çalıştırma
 
 **Repo**
 
