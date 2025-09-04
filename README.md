@@ -76,7 +76,7 @@ Projenin çalıştırılabilmesi için aşağıdaki yazılım ve donanım gereks
 - **NVIDIA GPU** *(opsiyonel)* → VLLM embedding servisinde büyük modelleri hızlandırmak için önerilir.  
 
 
-### 1. Kurulum & Çalıştırma
+#### 1. Kurulum & Çalıştırma
 
 1) Repo
 
@@ -85,9 +85,10 @@ git clone https://gobitbucket.havelsan.com.tr/scm/main/main-websearch.git
 cd Main_Web_Search
 ```
 
-### 2. Docker ile Çalıştırma
+#### 2. Docker ile Çalıştırma
 
-#### VLLM Embedding Servisini Başlat
+### VLLM Embedding Servisini Başlat
+
 ```bash
 cd vllm_embedding_service
 python main_vllm_embedding.py --model-path ../models/Qwen3-Embedding-4B --port 21003
@@ -101,13 +102,12 @@ curl http://localhost:21003/v1/embeddings \
         "input": ["Merhaba dünya", "Embedding testi"]
       }'
 ```
-#### Routing Servisini Docker ile Çalıştır
+
+### Routing Endpoint
+## Routing Servisini Docker ile Çalıştır
 ```bash
 docker-compose up -d main-web-search
 ```
-
-### Routing Endpoint
-
 **cURL Örneği:**
 ```bash
 curl -X POST "http://10.150.98.209:9500/ask_question" \
@@ -117,7 +117,7 @@ curl -X POST "http://10.150.98.209:9500/ask_question" \
 
 **Swagger UI Erişimi:** http://10.150.98.209:9500/docs
 
-### Web Search Endpoint
+#### Web Search Endpoint
 
 ```bash
 POST http://localhost:8000/search
@@ -128,13 +128,13 @@ Content-Type: application/json
     "topk": 10
 }
 ```
-#### Tüm Servisleri Başlatma
+### Tüm Servisleri Başlatma
 
 ```bash
 docker-compose up -d
 ```
 
-## Ek Notlar
+### Ek Notlar
 
 ### Endpoint Erişim Bilgileri
 - **Routing Swagger UI**: http://10.150.98.209:9500/docs
