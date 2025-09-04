@@ -92,6 +92,12 @@ Projenin çalıştırılabilmesi için aşağıdaki yazılım ve donanım gereks
 ```bash
 git clone https://gobitbucket.havelsan.com.tr/scm/main/main-websearch.git
 cd Main_Web_Search
+
+# mevcut branch'leri listele
+git branch -a
+
+# "Main_v2_Web_Search_latest" branch'ine geç
+git checkout Main_v2_Web_Search_latest
 ```
 
 ## 2. Docker ile Çalıştırma
