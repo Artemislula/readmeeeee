@@ -1,15 +1,24 @@
-# Main Web Search Extension
+# Main V2 Web Search 
 
 ## Proje Amacı
 
 Bu proje, HAVELSAN'ın **Main v2 platformuna Web Search eklentisi** geliştirmek amacıyla oluşturulmuştur.  
-Proje, hem **HAVELSAN'ın ürün dokümanları** hem de **web verilerini** indeksleyerek, kullanıcıların sorularına:
+Sistem, kullanıcı sorgularını hem **HAVELSAN ürün dokümanları** hem de **web verileri** üzerinde işleyerek en uygun bilgi kaynağını seçer ve yanıt döner.
 
-- **RAG (Retrieval-Augmented Generation)** tabanlı  
-- **Web araması** tabanlı  
-
-yanıtlar sunmaktadır.
-
+### Teknik Çalışma Prensibi
+- **Routing Mekanizması**:  
+  Kullanıcıdan gelen her sorgu, **routing servisine** iletilir.  
+  - Sorgu, embedding modeli ile vektörel uzaya dönüştürülür.  
+  - Bu embedding üzerinden sorgunun en yakın olduğu **kategori tahmini (label prediction)** yapılır.  
+  - Routing servisi, sorgu için bir **etiket (label)** döndürür:
+    - `"web"` → Sorgu **web_search_service** üzerinden işlenir.  
+      - Google Search API çağrılır.  
+      - İlgili URL’ler crawl edilerek içerikler çıkarılır.  
+      - Kullanıcıya web kaynaklı sonuçlar döner.  
+    - `"havelsan_urunler"` → Sorgu **RAG pipeline** üzerinden işlenir.  
+      - Qdrant üzerinde benzerlik araması yapılır.  
+      - MongoDB’den ilgili chunk içerikleri ve referans dokümanlar çekilir.  
+      - Kullanıcıya doküman tabanlı yanıt döner.  
 ---
 
 ## Mimari Bileşenler
