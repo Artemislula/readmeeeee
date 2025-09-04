@@ -78,7 +78,7 @@ Projenin çalıştırılabilmesi için aşağıdaki yazılım ve donanım gereks
 
 #### 1. Kurulum & Çalıştırma
 
-1) Repo
+**Repo**
 
 ```bash
 git clone https://gobitbucket.havelsan.com.tr/scm/main/main-websearch.git
@@ -104,7 +104,9 @@ curl http://localhost:21003/v1/embeddings \
 ```
 
 ### Routing Endpoint
-## Routing Servisini Docker ile Çalıştır
+
+**Routing Servisini Docker ile Çalıştır**
+
 ```bash
 docker-compose up -d main-web-search
 ```
