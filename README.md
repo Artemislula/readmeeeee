@@ -128,7 +128,7 @@ curl -X POST "http://10.150.98.209:9500/ask_question" \
 
 **Swagger UI Erişimi:** http://10.150.98.209:9500/docs
 
-#### Web Search Endpoint
+### Web Search Endpoint
 
 ```bash
 POST http://localhost:8000/search
@@ -155,5 +155,13 @@ docker-compose up -d
 - MongoDB ve Qdrant servislerinin çalıştığından emin olun
 - `.env` dosyasındaki bağlantı bilgilerini kontrol edin
 - VLLM servisi için yeterli GPU memory olduğunu kontrol edin
+
+## Katkıda Bulunanlar
+
+| İsim               | Rol ve Katkılar                                                                                   |
+|--------------------|---------------------------------------------------------------------------------------------------|
+| **Serdar Kalaycı** | Proje sürecinin teknik liderliği, genel mimari tasarım, mikroservislerin entegrasyon planlaması, sistem mimarisinin doğrulanması ve geliştirme sürecinin koordinasyonu |
+| **Elif Tuğba Olcar** | Routing servisinin geliştirilmesi (kategori tahmini, label bazlı yönlendirme), MongoDB & Qdrant bağlantılarının entegrasyonu, VLLM embedding servisinin dockerizasyonu ve optimizasyonu,  Veri düzenleme ve indeksleme sürecinin uygulanması |
+| **Furkan Ceyran**  | Web crawlingin geliştirilmesi, Crawler modüllerinin optimizasyonu ve web tabanlı veri toplama sürecinin entegrasyonu |
 
 ---
