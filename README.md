@@ -2,46 +2,45 @@
 
 ## Proje Amacı
 
-Bu proje, HAVELSAN'ın Main v2 platformuna Web Search eklentisi geliştirmek amacıyla oluşturulmuştur. Proje, hem HAVELSAN'ın ürün dokümanları hem de web verilerini indeksleyerek, kullanıcıların sorularına RAG (Retrieval-Augmented Generation) ve web araması tabanlı yanıtlar sunmaktadır.
+Bu proje, HAVELSAN'ın **Main v2 platformuna Web Search eklentisi** geliştirmek amacıyla oluşturulmuştur.  
+Proje, hem **HAVELSAN'ın ürün dokümanları** hem de **web verilerini** indeksleyerek, kullanıcıların sorularına:
 
+- **RAG (Retrieval-Augmented Generation)** tabanlı  
+- **Web araması** tabanlı  
 
+yanıtlar sunmaktadır.
 
-### Bileşenler
-Mimari Bileşenler
-1. Routing Service (Routing_service/, Port: 9500)
-Ana servis, sorgu yönlendirme görevini yapar.
+---
 
-MongoDB ve Qdrant bağlantılarını içerir.
+## Mimari Bileşenler
 
-İndekslenen kaynaklar:
+### 1. Routing Service (`Routing_service/`, Port: `9500`)
+- Ana servis, sorgu yönlendirme görevini yapar.  
+- **MongoDB** ve **Qdrant** bağlantılarını içerir.  
+- **İndekslenen kaynaklar:**
+  - HAVELSAN ürün dokümanları
+  - Web içerikleri  
+- Kullanıcı sorgusunun hangi kaynaktan cevaplanacağına karar verir:
+  - Eğer **web** → `web_search_service` altındaki kodlar çalıştırılır.
+  - Eğer **rag** → Qdrant ve Mongo’dan gelen sonuçlar işlenir.
 
-HAVELSAN ürün dokümanları
+---
 
-Web içerikleri
+### 2. VLLM Embedding Service (`vllm_embedding_service/`, Port: `21003`)
+- Embedding üretimi için ayrı bir mikroservis olarak dockerize edilmiştir.  
+- Büyük boyutlu modellerin (örn. **Qwen3-Embedding-4B**) performanslı şekilde kullanılmasını sağlar.  
+- `http://<host>:21003/v1/embeddings` endpoint’i üzerinden embedding isteklerini işler.  
 
-Kullanıcı sorgusunun hangi kaynaktan cevaplanacağına karar verir:
+---
 
-Eğer web → web_search_service altındaki kodlar çalıştırılır.
+### 3. Web Search Service (`web_search_service/`, Port: varsayılan `8000`)
+- Routing mekanizması tarafından çağrılır.  
+- Web aramaları için **Google Search API** + **crawler modülleri** kullanılır.  
+- Kullanıcının sorgusunu gerçek zamanlı olarak web’den getirir ve işler.  
 
-Eğer rag → Qdrant ve Mongo’dan gelen sonuçlar işlenir.
+---
 
-2. VLLM Embedding Service (vllm_embedding_service/, Port: 21003)
-
-Embedding üretimi için ayrı bir mikroservis olarak dockerize edilmiştir.
-
-Büyük boyutlu modellerin (örn. Qwen3-Embedding-4B) performanslı şekilde kullanılmasını sağlar.
-
-http://<host>:21003/v1/embeddings endpoint’i üzerinden embedding isteklerini işler.
-
-3. Web Search Service (web_search_service/, Port: varsayılan 8000)
-
-Routing mekanizması tarafından çağrılır.
-
-Web aramaları için Google Search API + crawler modüllerini kullanır.
-
-Kullanıcının sorgusunu gerçek zamanlı olarak web’den getirir ve işler.
-
-## 📁 Dosya Yapısı
+## Dosya Yapısı
 
 ```
 Main_Web_Search/
@@ -71,54 +70,43 @@ Main_Web_Search/
 └── models/                      # ML modelleri
     └── Qwen3-Embedding-4B/      # Embedding modeli
 ```
-Gereksinimler
+## Gereksinimler
 
-Docker & Docker Compose
+Projenin çalıştırılabilmesi için aşağıdaki yazılım ve donanım gereksinimleri karşılanmalıdır:
 
-MongoDB (Port: 27027)
+- **Docker & Docker Compose** → Servislerin container ortamında çalıştırılması için.  
+- **MongoDB** (Port: `27027`) → Metin içeriklerinin ve chunk verilerinin saklanması için.  
+- **Qdrant Vector DB** (Port: `6363`) → Vektör tabanlı arama (semantic search) için.  
+- **Python 3.10+** → Lokal geliştirme ve test ortamları için.  
+- **NVIDIA GPU** *(opsiyonel)* → VLLM embedding servisinde büyük modelleri hızlandırmak için önerilir.  
 
-Qdrant Vector DB (Port: 6363)
 
-Python 3.10+ (lokal geliştirme için)
+### 1. Kurulum & Çalıştırma
 
-NVIDIA GPU (opsiyonel, VLLM için önerilir)
-
-### 1. Repository Clone
-Kurulum & Çalıştırma
 1) Repo
-   
+
 ```bash
 git clone https://gobitbucket.havelsan.com.tr/scm/main/main-websearch.git
 cd Main_Web_Search
 ```
 
-### 2. Ortam Değişkenlerini Yapılandırma
-`.env` dosyasını düzenleyerek veritabanı bağlantı bilgilerini güncelleyin:
 
-```env
-# Qdrant
-QDRANT_URL=http://10.150.98.209
-QDRANT_PORT=6363
-QDRANT_COLLECTION=main_web   
-
-# Mongo
-MONGO_URI=mongodb://admin:password@10.150.98.209:27027/?authSource=admin
-MONGO_DB=main
-MONGO_WEB_DB=main
-MONGO_MAIN_WEB_LOG=main_web_log
-MONGO_MAIN_WEB=main_web
-TOP_K=5
-
-VLLM_EMBEDDING_URL=http://10.150.98.209:21003/v1/embeddings
-
-```
-
-### 3. Docker ile Çalıştırma
+### 2. Docker ile Çalıştırma
 
 #### VLLM Servisini Başlat
 ```bash
 cd vllm_embedding_service
 python main_vllm_embedding.py --model-path ../models/Qwen3-Embedding-4B --port 21003
+```
+### Ana Routing Endpoint
+```bash
+POST http://10.150.98.209:9500/ask_question
+Content-Type: application/json
+
+{
+    "query": "HAVELSAN BARKAN sistemi hakkında bilgi ver",
+    "top_k": 5
+}
 ```
 
 #### Routing Servisini Docker ile Çalıştır
@@ -132,42 +120,6 @@ docker-compose up -d main-web-search
 
 ```bash
 docker-compose up -d
-```
-
-### 4. Manuel Kurulum (Geliştirme)
-
-#### Routing Service
-```bash
-cd Routing_service/app
-pip install -r requirements.txt
-uvicorn web_service:app --host 0.0.0.0 --port 9500 --reload
-```
-
-#### Web Search Service
-```bash
-cd web_search_service
-pip install -r requirements.txt
-python api.py
-```
-
-#### vLLM Embedding Service
-```bash
-cd vllm_embedding_service
-python main_vllm_embedding.py --model-path /home/etolcar/Main_Web_Search/models/Qwen3-Embedding-4B --port 21003
-```
-
-
-## API Kullanımı
-
-### Ana Routing Endpoint
-```bash
-POST http://10.150.98.209:9500/ask_question
-Content-Type: application/json
-
-{
-    "query": "HAVELSAN BARKAN sistemi hakkında bilgi ver",
-    "top_k": 5
-}
 ```
 
 **cURL Örneği:**
@@ -191,15 +143,6 @@ Content-Type: application/json
 ```
 
 ### Embedding Service
-```bash
-POST http://localhost:21003/v1/embeddings
-Content-Type: application/json
-
-{
-    "input": ["text to embed"],
-    "model": "Qwen3-Embedding-4B"
-}
-```
 
 **cURL Örneği:**
 ```bash
@@ -211,7 +154,7 @@ curl http://localhost:21003/v1/embeddings \
       }'
 ```
 
-## 📝 Ek Notlar
+## Ek Notlar
 
 ### Geliştirme İpuçları
 - Swagger UI üzerinden API'leri test edebilirsiniz
@@ -219,8 +162,7 @@ curl http://localhost:21003/v1/embeddings \
 - VLLM servisi başlatılırken model path'inin doğru olduğundan emin olun
 
 ### Endpoint Erişim Bilgileri
-- **Routing Service**: http://10.150.98.209:9500
-- **Swagger UI**: http://10.150.98.209:9500/docs
+- **Routing Swagger UI**: http://10.150.98.209:9500/docs
 - **Embedding Service**: http://10.150.98.209:21003
 
 ### Troubleshooting
@@ -229,7 +171,3 @@ curl http://localhost:21003/v1/embeddings \
 - VLLM servisi için yeterli GPU memory olduğunu kontrol edin
 
 ---
-
-Bu README dosyası projenin mevcut durumuna göre hazırlanmıştır ve gelişime göre güncellenecektir.
-
-
