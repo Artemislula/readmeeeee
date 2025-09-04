@@ -94,7 +94,7 @@ git clone https://gobitbucket.havelsan.com.tr/scm/main/main-websearch.git
 cd Main_Web_Search
 ```
 
-#### 2. Docker ile Çalıştırma
+## 2. Docker ile Çalıştırma
 
 ### VLLM Embedding Servisini Başlat
 
